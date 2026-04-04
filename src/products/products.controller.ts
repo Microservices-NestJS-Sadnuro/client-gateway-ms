@@ -1,5 +1,9 @@
-import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { catchError, firstValueFrom } from 'rxjs';
+import { PaginationDto } from 'src/common';
+import { CreateProductDto } from 'src/common/dtos/create-product.dto';
+import { UpdateProductDto } from 'src/common/dtos/update-product.dto';
 import { PRODUCT_SERVICE } from 'src/config';
 
 @Controller('products')
@@ -9,27 +13,32 @@ export class ProductsController {
   ) { }
 
   @Post()
-  create() {
-    return 'Create product';
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productsClient.send({ cmd: 'create_product' }, createProductDto);
   }
 
   @Get()
-  findAll() {
-    return this.productsClient.send({ cmd: 'find_all_products' }, {});
+  findAll(@Query() paginationDto: PaginationDto) {
+    return this.productsClient.send({ cmd: 'find_all_products' }, paginationDto);
   }
 
   @Get(':id')
-  findByID(@Param('id', ParseIntPipe) id: number) {
-    return 'Find product by id: ' + id;
+  async findByID(@Param('id', ParseIntPipe) id: number) {
+    return this.productsClient.send({ cmd: 'find_one_product' }, { id })
+      .pipe( // Implement observable pipe for chatching exception
+        catchError(err => {
+          throw new BadRequestException(err);
+        })
+      );
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
-    return 'Update product with ID:' + id;
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
+    return this.productsClient.send({ cmd: 'update_product' }, { ...updateProductDto, id });
   }
 
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
-    return 'Delete product with ID:' + id;
+    return this.productsClient.send({ cmd: 'delete_product' }, { id });
   }
 }
