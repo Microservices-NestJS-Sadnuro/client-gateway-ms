@@ -33,7 +33,7 @@ export class OrdersController {
 
   @Patch(':id')
   changeOrderStatus(@Query('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersClient.send('changeOrderStatus', { id, ...updateOrderDto })
+    return this.ordersClient.send('changeOrderStatus', { ...updateOrderDto, id })
 
   }
 
