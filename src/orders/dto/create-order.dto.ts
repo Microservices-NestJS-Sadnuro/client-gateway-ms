@@ -1,11 +1,6 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsPositive, IsString } from "class-validator";
-
-export enum OrderStatus {
-    PENDING = 'PENDING',
-    DELIVERED = 'DELIVERED',
-    CANCELLED = 'CANCELLED',
-}
+import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { OrderStatus, OrderStatusList } from "../enums/order.enum";
 
 export class CreateOrderDto {
     @IsNumber()
@@ -18,11 +13,15 @@ export class CreateOrderDto {
     @Type(() => Number)
     totalItems: number;
 
-    @IsEnum(OrderStatus)
-    status: OrderStatus;
+    @IsEnum(OrderStatusList, {
+        message: `Status must be one of ${OrderStatusList.join(', ')}`
+    })
+    @IsOptional()
+    status: OrderStatus = OrderStatus.PENDING;
 
-    // @IsBoolean()
-    // paid: boolean;
+    @IsBoolean()
+    @IsOptional()
+    paid: boolean = false;
 
     // @IsDate()
     // @Type(() => Date)
