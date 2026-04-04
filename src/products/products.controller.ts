@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError, firstValueFrom } from 'rxjs';
 import { PaginationDto } from 'src/common';
 import { CreateProductDto } from 'src/common/dtos/create-product.dto';
@@ -26,9 +26,7 @@ export class ProductsController {
   async findByID(@Param('id', ParseIntPipe) id: number) {
     return this.productsClient.send({ cmd: 'find_one_product' }, { id })
       .pipe( // Implement observable pipe for chatching exception
-        catchError(err => {
-          throw new BadRequestException(err);
-        })
+        catchError(err => { throw new RpcException(err) })
       );
   }
 
