@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, ParseIntPipe, ParseUUIDPipe, Logger } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ORDERS_SERVICE } from 'src/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common';
 import { catchError } from 'rxjs';
+import { OrderPaginationDto } from './dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -19,20 +20,21 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
-    return this.ordersClient.send('findAllOrders', paginationDto); ///this.ordersService.findAll();
+  findAll(@Query() orderPaginationDto: OrderPaginationDto) {
+    return this.ordersClient.send('findAllOrders', orderPaginationDto); ///this.ordersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: string) {
-    return this.ordersClient.send('findOne', { id })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    console.log('Entry REST Controller - find one order');
+    return this.ordersClient.send('findOneOrder', id)
       .pipe( // Implement observable pipe for chatching exception
         catchError(err => { throw new RpcException(err) })
       );; //this.ordersService.findOne(+id);
   }
 
   @Patch(':id')
-  changeOrderStatus(@Query('id', ParseIntPipe) id: number, @Body() updateOrderDto: UpdateOrderDto) {
+  changeOrderStatus(@Query('id', ParseUUIDPipe) id: string, @Body() updateOrderDto: UpdateOrderDto) {
     return this.ordersClient.send('changeOrderStatus', { ...updateOrderDto, id })
 
   }
