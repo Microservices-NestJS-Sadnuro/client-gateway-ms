@@ -33,7 +33,10 @@ export class OrdersController {
   @ApiOperation({ summary: 'Obtener todas las ordenes' })
   @ApiResponse({ status: 200, description: 'Lista de ordenes con paginacion' })
   findAll(@Query() orderPaginationDto: OrderPaginationDto) {
-    return this.ordersClient.send('findAllOrders', orderPaginationDto); ///this.ordersService.findAll();
+    return this.ordersClient.send('findAllOrders', orderPaginationDto)
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Get('id/:id')
@@ -56,7 +59,10 @@ export class OrdersController {
     @Query() paginationDto: PaginationDto
   ) {
 
-    return this.ordersClient.send('findAllOrdersByStatus', { status: statusDto.status, ...paginationDto });
+    return this.ordersClient.send('findAllOrdersByStatus', { status: statusDto.status, ...paginationDto })
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Patch('id/:id')
