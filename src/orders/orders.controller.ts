@@ -8,6 +8,8 @@ import { catchError } from 'rxjs';
 import { OrderPaginationDto } from './dto';
 import { StatusDto } from './dto/status.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+
 
 @Controller('orders')
 export class OrdersController {
@@ -16,17 +18,25 @@ export class OrdersController {
   ) { }
 
   @Post()
+  @ApiOperation({ summary: 'Crear una orden' })
+  @ApiResponse({ status: 201, description: 'Orden creada exitosamente', type: CreateOrderDto })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   create(@Body() createOrderDto: CreateOrderDto) {
     console.log('Entry REST Controller - create order');
     return this.ordersClient.send('createOrder', createOrderDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Obtener todas las ordenes' })
+  @ApiResponse({ status: 200, description: 'Lista de ordenes con paginacion' })
   findAll(@Query() orderPaginationDto: OrderPaginationDto) {
     return this.ordersClient.send('findAllOrders', orderPaginationDto); ///this.ordersService.findAll();
   }
 
   @Get('id/:id')
+  @ApiOperation({ summary: 'Obtener una orden por ID' })
+  @ApiResponse({ status: 200, description: 'Devuelve la orden correspondiente' })
+  @ApiResponse({ status: 404, description: 'Orden no encontrada' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     console.log('Entry REST Controller - find one order');
     return this.ordersClient.send('findOneOrder', id)
@@ -36,6 +46,8 @@ export class OrdersController {
   }
 
   @Get(':status')
+  @ApiOperation({ summary: 'Obtener ordenes por estado' })
+  @ApiResponse({ status: 200, description: 'Devuelve las ordenes filtradas por estado' })
   findAllByStatus(
     @Param() statusDto: StatusDto,
     @Query() paginationDto: PaginationDto
@@ -45,6 +57,9 @@ export class OrdersController {
   }
 
   @Patch('id/:id')
+  @ApiOperation({ summary: 'Cambiar el estado de una orden' })
+  @ApiResponse({ status: 200, description: 'Estado de la orden actualizado exitosamente' })
+  @ApiResponse({ status: 404, description: 'Orden no encontrada' })
   changeOrderStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto
