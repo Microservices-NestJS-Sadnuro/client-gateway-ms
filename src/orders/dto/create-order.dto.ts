@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsEnum, IsNumber, IsOptional, IsPositive, IsString, ValidateNested } from "class-validator";
 import { OrderStatus, OrderStatusList } from "../enums/order.enum";
+import { CreateOrderDetailDto } from "./create-order-detail.dto";
 
 export class CreateOrderDto {
     @IsNumber()
@@ -26,4 +27,8 @@ export class CreateOrderDto {
     // @IsDate()
     // @Type(() => Date)
     // paidAt: Date;
+
+    @ValidateNested({ each: true })
+    @Type(() => CreateOrderDetailDto)
+    orderDetail: CreateOrderDetailDto[];
 }
