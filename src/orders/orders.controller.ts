@@ -6,6 +6,7 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common';
 import { catchError } from 'rxjs';
 import { OrderPaginationDto } from './dto';
+import { StatusDto } from './dto/status.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -24,13 +25,22 @@ export class OrdersController {
     return this.ordersClient.send('findAllOrders', orderPaginationDto); ///this.ordersService.findAll();
   }
 
-  @Get(':id')
+  @Get('id/:id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     console.log('Entry REST Controller - find one order');
     return this.ordersClient.send('findOneOrder', id)
       .pipe( // Implement observable pipe for chatching exception
         catchError(err => { throw new RpcException(err) })
       );; //this.ordersService.findOne(+id);
+  }
+
+  @Get(':status')
+  findAllByStatus(
+    @Param() statusDto: StatusDto,
+    @Query() paginationDto: PaginationDto
+  ) {
+
+    return this.ordersClient.send('findAllOrdersByStatus', { status: statusDto.status, ...paginationDto });
   }
 
   @Patch(':id')
