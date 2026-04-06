@@ -4,10 +4,10 @@ import { OrderStatus, OrderStatusList } from "../enums/order.enum";
 import { CreateOrderDetailDto } from "./create-order-detail.dto";
 
 export class CreateOrderDto {
-    @IsNumber()
-    @IsPositive()
-    @Type(() => Number)
-    totalAmount: number;
+    // @IsNumber()
+    // @IsPositive()
+    // @Type(() => Number)
+    // totalAmount: number;
 
     @IsNumber()
     @IsPositive()

@@ -23,7 +23,10 @@ export class OrdersController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   create(@Body() createOrderDto: CreateOrderDto) {
     console.log('Entry REST Controller - create order');
-    return this.ordersClient.send('createOrder', createOrderDto);
+    return this.ordersClient.send('createOrder', createOrderDto)
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Get()
