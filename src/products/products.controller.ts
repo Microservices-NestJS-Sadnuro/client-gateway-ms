@@ -18,14 +18,20 @@ export class ProductsController {
   @ApiResponse({ status: 201, description: 'Producto creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productsClient.send({ cmd: 'create_product' }, createProductDto);
+    return this.productsClient.send({ cmd: 'create_product' }, createProductDto)
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener todos los productos' })
   @ApiResponse({ status: 200, description: 'Devuelve una lista de productos' })
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.productsClient.send({ cmd: 'find_all_products' }, paginationDto);
+    return this.productsClient.send({ cmd: 'find_all_products' }, paginationDto)
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Get(':id')
@@ -44,7 +50,10 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Producto actualizado exitosamente' })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsClient.send({ cmd: 'update_product' }, { ...updateProductDto, id });
+    return this.productsClient.send({ cmd: 'update_product' }, { ...updateProductDto, id })
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
   @Delete(':id')
@@ -52,6 +61,9 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Producto eliminado exitosamente' })
   @ApiResponse({ status: 404, description: 'Producto no encontrado' })
   delete(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient.send({ cmd: 'delete_product' }, { id });
+    return this.productsClient.send({ cmd: 'delete_product' }, { id })
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 }
