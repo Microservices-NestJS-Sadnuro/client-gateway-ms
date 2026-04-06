@@ -7,6 +7,7 @@ import { PaginationDto } from 'src/common';
 import { catchError } from 'rxjs';
 import { OrderPaginationDto } from './dto';
 import { StatusDto } from './dto/status.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -43,10 +44,16 @@ export class OrdersController {
     return this.ordersClient.send('findAllOrdersByStatus', { status: statusDto.status, ...paginationDto });
   }
 
-  @Patch(':id')
-  changeOrderStatus(@Query('id', ParseUUIDPipe) id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersClient.send('changeOrderStatus', { ...updateOrderDto, id })
-
+  @Patch('id/:id')
+  changeOrderStatus(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto
+  ) {
+    console.log('Entry REST Controller - change order status');
+    return this.ordersClient.send('changeOrderStatus', { ...updateOrderStatusDto, id })
+      .pipe(
+        catchError(err => { throw new RpcException(err) })
+      );
   }
 
 }
