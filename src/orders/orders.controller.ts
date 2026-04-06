@@ -46,9 +46,9 @@ export class OrdersController {
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     console.log('Entry REST Controller - find one order');
     return this.ordersClient.send('findOneOrder', id)
-      .pipe( // Implement observable pipe for chatching exception
+      .pipe(
         catchError(err => { throw new RpcException(err) })
-      );; //this.ordersService.findOne(+id);
+      );
   }
 
   @Get(':status')
